@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dynamic Difficulty Tetris</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="app">
+
+        <header class="header">
+            <h1>Dynamic Difficulty Tetris</h1>
+            <p>Real-Time Adaptive Game Difficulty</p>
+        </header>
+
+        <section class="game-layout">
+
+            <!-- Tetris Board -->
+            <div class="game-container">
+                <canvas id="gameCanvas" width="300" height="600"></canvas>
+            </div>
+
+            <!-- Information Panel -->
+            <aside class="panel">
+
+                <div class="stat">
+                    <span>Score</span>
+                    <strong id="score">0</strong>
+                </div>
+
+                <div class="stat">
+                    <span>Lines</span>
+                    <strong id="lines">0</strong>
+                </div>
+
+                <div class="stat">
+                    <span>Level</span>
+                    <strong id="level">1</strong>
+                </div>
+
+                <div class="stat">
+                    <span>Difficulty</span>
+                    <strong id="difficulty">Normal</strong>
+                </div>
+
+                <div class="stat">
+                    <span>Fall Speed</span>
+                    <strong id="speed">1.00x</strong>
+                </div>
+
+                <div class="dda-panel">
+
+                    <h2>DDA Monitor</h2>
+
+                    <div class="metric">
+                        <span>Performance</span>
+                        <strong id="performance">50%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <div id="performanceBar"></div>
+                    </div>
+
+                    <div class="metric">
+                        <span>DDA Status</span>
+                        <strong id="ddaStatus">Waiting</strong>
+                    </div>
+
+                </div>
+
+                <div class="controls">
+                    <button id="startButton">Start Game</button>
+                    <button id="restartButton">Restart</button>
+                </div>
+
+                <div class="instructions">
+                    <p><strong>Controls</strong></p>
+                    <p>← → Move</p>
+                    <p>↑ Rotate</p>
+                    <p>↓ Soft Drop</p>
+                    <p>Space Hard Drop</p>
+                </div>
+
+                <div class="experiment-section">
+
+                    <p><strong>Experiment</strong></p>
+
+                    <button id="exportButton">
+                        Export Data
+                    </button>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <script src="dda.js"></script>
+    <script src="logger.js"></script>
+    <script src="game.js"></script>
+
+</body>
+</html>
