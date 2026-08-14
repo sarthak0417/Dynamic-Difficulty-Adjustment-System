@@ -1,3 +1,4 @@
+
 // ============================================
 // DYNAMIC DIFFICULTY TETRIS
 // ============================================
@@ -22,7 +23,8 @@ const COLS = 10;
 const ROWS = 20;
 const BLOCK_SIZE = 30;
 
-let board = createBoard();
+let board =
+    createBoard();
 
 
 // ============================================
@@ -36,6 +38,7 @@ let level = 1;
 
 let gameRunning = false;
 let gameOver = false;
+let gamePaused = false;
 
 let dropCounter = 0;
 let lastTime = 0;
@@ -47,7 +50,8 @@ let dropInterval = 1000;
 // DDA
 // ============================================
 
-const dda = new DDAEngine();
+const dda =
+    new DDAEngine();
 
 
 // ============================================
@@ -58,8 +62,8 @@ let player = {
 
     x: 0,
     y: 0,
-
     matrix: null
+
 };
 
 
@@ -110,6 +114,7 @@ const PIECES = {
         [0, 1, 1],
         [0, 0, 0]
     ]
+
 };
 
 
@@ -120,9 +125,16 @@ const PIECES = {
 function createBoard() {
 
     return Array.from(
-        { length: ROWS },
-        () => Array(COLS).fill(0)
+
+        {
+            length: ROWS
+        },
+
+        () =>
+            Array(COLS).fill(0)
+
     );
+
 }
 
 
@@ -138,13 +150,15 @@ function createPiece() {
     const randomKey =
         keys[
             Math.floor(
-                Math.random() * keys.length
+                Math.random() *
+                keys.length
             )
         ];
 
     return PIECES[randomKey].map(
         row => [...row]
     );
+
 }
 
 
@@ -166,13 +180,17 @@ function resetPlayer() {
         );
 
 
-    // Check whether new piece
-    // can actually enter the board
-
-    if (collides(board, player)) {
+    if (
+        collides(
+            board,
+            player
+        )
+    ) {
 
         endGame();
+
     }
+
 }
 
 
@@ -180,10 +198,14 @@ function resetPlayer() {
 // COLLISION
 // ============================================
 
-function collides(board, player) {
+function collides(
+    board,
+    player
+) {
 
     const matrix =
         player.matrix;
+
 
     for (
         let y = 0;
@@ -208,38 +230,43 @@ function collides(board, player) {
                     y + player.y;
 
 
-                // Left/right walls
                 if (
                     boardX < 0 ||
                     boardX >= COLS
                 ) {
 
                     return true;
+
                 }
 
 
-                // Bottom
                 if (
                     boardY >= ROWS
                 ) {
 
                     return true;
+
                 }
 
 
-                // Existing block
                 if (
                     boardY >= 0 &&
                     board[boardY][boardX] !== 0
                 ) {
 
                     return true;
+
                 }
+
             }
+
         }
+
     }
 
+
     return false;
+
 }
 
 
@@ -247,7 +274,10 @@ function collides(board, player) {
 // MERGE
 // ============================================
 
-function merge(board, player) {
+function merge(
+    board,
+    player
+) {
 
     player.matrix.forEach(
         (row, y) => {
@@ -255,13 +285,16 @@ function merge(board, player) {
             row.forEach(
                 (value, x) => {
 
-                    if (value !== 0) {
+                    if (
+                        value !== 0
+                    ) {
 
                         board[
                             y + player.y
                         ][
                             x + player.x
                         ] = value;
+
                     }
 
                 }
@@ -269,6 +302,7 @@ function merge(board, player) {
 
         }
     );
+
 }
 
 
@@ -281,9 +315,13 @@ function rotate(matrix) {
     return matrix[0].map(
         (_, index) =>
             matrix
-                .map(row => row[index])
+                .map(
+                    row =>
+                        row[index]
+                )
                 .reverse()
     );
+
 }
 
 
@@ -293,7 +331,10 @@ function playerRotate() {
         player.matrix;
 
     player.matrix =
-        rotate(player.matrix);
+        rotate(
+            player.matrix
+        );
+
 
     if (
         collides(
@@ -304,7 +345,9 @@ function playerRotate() {
 
         player.matrix =
             oldMatrix;
+
     }
+
 }
 
 
@@ -312,9 +355,13 @@ function playerRotate() {
 // MOVEMENT
 // ============================================
 
-function playerMove(direction) {
+function playerMove(
+    direction
+) {
 
-    player.x += direction;
+    player.x +=
+        direction;
+
 
     if (
         collides(
@@ -323,8 +370,11 @@ function playerMove(direction) {
         )
     ) {
 
-        player.x -= direction;
+        player.x -=
+            direction;
+
     }
+
 }
 
 
@@ -336,6 +386,7 @@ function playerDrop() {
 
     player.y++;
 
+
     if (
         collides(
             board,
@@ -346,9 +397,12 @@ function playerDrop() {
         player.y--;
 
         lockPiece();
+
     }
 
+
     dropCounter = 0;
+
 }
 
 
@@ -358,22 +412,20 @@ function playerDrop() {
 
 function lockPiece() {
 
-    // The falling piece has reached
-    // its final position.
     merge(
         board,
         player
     );
 
-    // Count this placement.
+
     piecesPlaced++;
 
-    // Check whether the placement
-    // completed any rows.
+
     clearLines();
 
-    // Create the next piece.
+
     resetPlayer();
+
 }
 
 
@@ -383,31 +435,38 @@ function lockPiece() {
 
 function hardDrop() {
 
-    // Move the piece down until the next
-    // position would cause a collision.
-    while (!collides(board, player)) {
+    while (
+        !collides(
+            board,
+            player
+        )
+    ) {
+
         player.y++;
+
     }
 
-    // We moved one position too far,
-    // so return to the last valid position.
+
     player.y--;
 
-    // The piece is now at the bottom.
-    // Lock it permanently into the board.
-    merge(board, player);
 
-    // Only completely filled rows will be
-    // removed by this function.
+    merge(
+        board,
+        player
+    );
+
+
     clearLines();
 
-    // Create the next falling piece.
+
     resetPlayer();
 
-    // Reset fall timer.
+
     dropCounter = 0;
 
+
     updateUI();
+
 }
 
 
@@ -419,48 +478,74 @@ function clearLines() {
 
     let cleared = 0;
 
+
     outer:
 
-    for (let y = ROWS - 1; y >= 0; y--) {
+    for (
+        let y = ROWS - 1;
+        y >= 0;
+        y--
+    ) {
 
-        // Check every cell in this row.
-        for (let x = 0; x < COLS; x++) {
+        for (
+            let x = 0;
+            x < COLS;
+            x++
+        ) {
 
-            // If even ONE cell is empty,
-            // this row is NOT complete.
-            if (board[y][x] === 0) {
+            if (
+                board[y][x] === 0
+            ) {
+
                 continue outer;
+
             }
+
         }
 
-        // We only reach here when ALL 10 cells
-        // contain blocks.
 
-        board.splice(y, 1);
+        board.splice(
+            y,
+            1
+        );
 
-        // Add an empty row at the top.
+
         board.unshift(
             Array(COLS).fill(0)
         );
 
+
         cleared++;
 
-        // Check this same position again because
-        // another row may have fallen into it.
         y++;
+
     }
 
-    if (cleared > 0) {
 
-        lines += cleared;
+    if (
+        cleared > 0
+    ) {
 
-        score += calculateScore(cleared);
+        lines +=
+            cleared;
+
+
+        score +=
+            calculateScore(
+                cleared
+            );
+
 
         level =
-            Math.floor(lines / 10) + 1;
+            Math.floor(
+                lines / 10
+            ) + 1;
+
 
         updateUI();
+
     }
+
 }
 
 
@@ -468,7 +553,9 @@ function clearLines() {
 // SCORE
 // ============================================
 
-function calculateScore(cleared) {
+function calculateScore(
+    cleared
+) {
 
     const scores = {
 
@@ -476,11 +563,14 @@ function calculateScore(cleared) {
         2: 300,
         3: 500,
         4: 800
+
     };
+
 
     return (
         scores[cleared] || 0
     ) * level;
+
 }
 
 
@@ -488,13 +578,10 @@ function calculateScore(cleared) {
 // DRAW BLOCK
 // ============================================
 
-function drawBlock(
-    x,
-    y
-) {
+function drawBlock(x, y) {
 
-    ctx.fillStyle =
-        "#2563eb";
+    // Fill the entire cell
+    ctx.fillStyle = "#2563eb";
 
     ctx.fillRect(
         x * BLOCK_SIZE,
@@ -503,16 +590,22 @@ function drawBlock(
         BLOCK_SIZE
     );
 
-    ctx.strokeStyle =
-        "#111827";
+
+    // Thin border between cells
+    ctx.strokeStyle = "#0f172a";
+
+    ctx.lineWidth = 1;
 
     ctx.strokeRect(
-        x * BLOCK_SIZE,
-        y * BLOCK_SIZE,
-        BLOCK_SIZE,
-        BLOCK_SIZE
+        x * BLOCK_SIZE + 0.5,
+        y * BLOCK_SIZE + 0.5,
+        BLOCK_SIZE - 1,
+        BLOCK_SIZE - 1
     );
+
 }
+
+
 
 
 // ============================================
@@ -535,9 +628,13 @@ function drawMatrix(
                     ) {
 
                         drawBlock(
+
                             x + offset.x,
+
                             y + offset.y
+
                         );
+
                     }
 
                 }
@@ -545,6 +642,7 @@ function drawMatrix(
 
         }
     );
+
 }
 
 
@@ -554,8 +652,11 @@ function drawMatrix(
 
 function draw() {
 
-    ctx.fillStyle =
-        "#050505";
+    // ----------------------------------------
+    // OUTSIDE / EMPTY CANVAS AREA
+    // ----------------------------------------
+
+    ctx.fillStyle = "#374151";
 
     ctx.fillRect(
         0,
@@ -564,6 +665,25 @@ function draw() {
         canvas.height
     );
 
+
+    // ----------------------------------------
+    // TETRIS PLAYING AREA
+    // ----------------------------------------
+
+    ctx.fillStyle = "#111827";
+
+    ctx.fillRect(
+        0,
+        0,
+        COLS * BLOCK_SIZE,
+        ROWS * BLOCK_SIZE
+    );
+
+
+
+    // ----------------------------------------
+    // DRAW EXISTING BLOCKS
+    // ----------------------------------------
 
     drawMatrix(
         board,
@@ -574,34 +694,58 @@ function draw() {
     );
 
 
+    // ----------------------------------------
+    // DRAW CURRENT PIECE
+    // ----------------------------------------
+
     if (
         player.matrix
     ) {
 
         drawMatrix(
+
             player.matrix,
+
             {
                 x: player.x,
                 y: player.y
             }
+
         );
+
     }
+
 }
+
+
 
 
 // ============================================
 // UPDATE DDA
 // ============================================
 
-function updateDDA(deltaTime) {
+function updateDDA(
+    deltaTime
+) {
 
-    if (!gameRunning) {
+    if (
+        !gameRunning
+    ) {
+
         return;
+
     }
 
-    window.gameScore = score;
-    window.gameLines = lines;
-    window.gamePieces = piecesPlaced;
+
+    window.gameScore =
+        score;
+
+    window.gameLines =
+        lines;
+
+    window.gamePieces =
+        piecesPlaced;
+
 
     window.ddaRawPerformance =
         dda.rawPerformance;
@@ -609,16 +753,23 @@ function updateDDA(deltaTime) {
     window.ddaPerformance =
         dda.performance;
 
+
     const settings =
         dda.evaluate(
+
             board,
+
             deltaTime
+
         );
 
 
     if (!settings) {
+
         return;
+
     }
+
 
     // ----------------------------------------
     // Store current DDA state
@@ -627,14 +778,21 @@ function updateDDA(deltaTime) {
     window.ddaRawPerformance =
         dda.rawPerformance;
 
+
     window.ddaPerformance =
         dda.performance;
+
 
     window.ddaDifficulty =
         settings.name;
 
+
     window.ddaSpeed =
         settings.multiplier;
+
+
+    window.ddaDecision =
+        settings.decision;
 
 
     // ----------------------------------------
@@ -643,9 +801,11 @@ function updateDDA(deltaTime) {
 
     experimentLogger.record({
 
-        score: score,
+        score:
+            score,
 
-        lines: lines,
+        lines:
+            lines,
 
         piecesPlaced:
             piecesPlaced,
@@ -664,15 +824,22 @@ function updateDDA(deltaTime) {
 
         decision:
             settings.decision
+
     });
 
 
+    // ----------------------------------------
     // Apply new fall speed
+    // ----------------------------------------
+
     dropInterval =
         settings.interval;
 
 
+    // ----------------------------------------
     // Update UI
+    // ----------------------------------------
+
     document
         .getElementById(
             "performance"
@@ -708,60 +875,85 @@ function updateDDA(deltaTime) {
 
 
     updateUI();
-}
 
+
+    // ----------------------------------------
+    // UPDATE EXPERIMENT GRAPH
+    // ----------------------------------------
+
+    drawExperimentGraph();
+
+}
 
 // ============================================
 // GAME LOOP
 // ============================================
 
-function update(time = 0) {
+function update(
+    time = 0
+) {
 
     const deltaTime =
         time - lastTime;
 
-    lastTime = time;
+
+    lastTime =
+        time;
 
 
-    if (gameRunning) {
+    // ----------------------------------------
+    // ONLY RUN GAME LOGIC WHEN NOT PAUSED
+    // ----------------------------------------
+
+    if (
+        gameRunning &&
+        !gamePaused
+    ) {
 
         dropCounter +=
             deltaTime;
 
 
         // Normal falling
+
         if (
             dropCounter >
             dropInterval
         ) {
 
             playerDrop();
+
         }
 
 
         // DDA
+
         updateDDA(
             deltaTime
         );
+
     }
 
 
+    // Always draw the game
+
     draw();
+
 
     requestAnimationFrame(
         update
     );
+
 }
 
 
 // ============================================
-// START
+// START / END GAME
 // ============================================
 
 function startGame() {
 
-    board =
-        createBoard();
+    board = createBoard();
 
     score = 0;
     lines = 0;
@@ -769,32 +961,75 @@ function startGame() {
     level = 1;
 
     dropCounter = 0;
-
     dropInterval = 1000;
 
     gameOver = false;
-
+    gamePaused = false;
     gameRunning = true;
 
+    // Change Start button to End Game
+    document
+        .getElementById("startButton")
+        .textContent = "End Game";
+
+    // Reset Pause button
+    document
+        .getElementById("pauseButton")
+        .textContent = "Pause";
 
     dda.reset();
+
     experimentLogger.startSession();
 
-
     hideGameOver();
-
 
     resetPlayer();
 
     updateUI();
 
+    document
+        .getElementById("ddaStatus")
+        .textContent = "Monitoring";
+
+    drawExperimentGraph();
+}
+
+// ============================================
+// END CURRENT GAME
+// ============================================
+
+function endCurrentGame() {
+
+    if (!gameRunning || gameOver) {
+        return;
+    }
+
+    gameRunning = false;
+    gamePaused = false;
+    gameOver = true;
+
+    // Save final experiment record
+    experimentLogger.endSession();
+
+    // Reset buttons
+    document
+        .getElementById("startButton")
+        .textContent = "Start Game";
 
     document
-        .getElementById(
-            "ddaStatus"
-        )
-        .textContent =
-            "Monitoring";
+        .getElementById("pauseButton")
+        .textContent = "Pause";
+
+    // Update status
+    document
+        .getElementById("ddaStatus")
+        .textContent = "Game Ended";
+
+    // Update graph
+    drawExperimentGraph();
+
+    // Show final score
+    showGameOver();
 }
 
 
@@ -805,6 +1040,40 @@ function startGame() {
 function restartGame() {
 
     startGame();
+
+}
+
+// ============================================
+// PAUSE / RESUME GAME
+// ============================================
+
+function togglePause() {
+
+    if (!gameRunning || gameOver) {
+        return;
+    }
+
+    gamePaused = !gamePaused;
+
+    const pauseButton =
+        document.getElementById("pauseButton");
+
+    if (gamePaused) {
+
+        pauseButton.textContent = "Resume";
+
+        document.getElementById("ddaStatus")
+            .textContent = "Paused";
+
+    } else {
+
+        pauseButton.textContent = "Pause";
+
+        document.getElementById("ddaStatus")
+            .textContent = "Monitoring";
+
+        lastTime = performance.now();
+    }
 }
 
 
@@ -818,7 +1087,7 @@ function endGame() {
 
     gameOver = true;
 
-    // Record final state
+
     experimentLogger.endSession();
 
 
@@ -831,6 +1100,10 @@ function endGame() {
 
 
     showGameOver();
+
+
+    drawExperimentGraph();
+
 }
 
 
@@ -882,8 +1155,9 @@ function updateUI() {
         )
         .textContent =
             settings.multiplier
-            .toFixed(2)
+                .toFixed(2)
             + "x";
+
 }
 
 
@@ -906,22 +1180,35 @@ function showGameOver() {
                 "div"
             );
 
+
         overlay.id =
             "gameOverOverlay";
 
+
         overlay.innerHTML = `
+
             <div class="game-over-box">
 
-                <h2>GAME OVER</h2>
+                <h2>
+                    GAME OVER
+                </h2>
 
-                <p>Your game has ended.</p>
+                <p>
+                    Your game has ended.
+                </p>
 
                 <div class="final-score">
-                    Score: <strong>${score}</strong>
+                    Score:
+                    <strong>
+                        ${score}
+                    </strong>
                 </div>
 
                 <div class="final-score">
-                    Lines: <strong>${lines}</strong>
+                    Lines:
+                    <strong>
+                        ${lines}
+                    </strong>
                 </div>
 
                 <button id="overlayRestart">
@@ -929,6 +1216,7 @@ function showGameOver() {
                 </button>
 
             </div>
+
         `;
 
 
@@ -949,6 +1237,7 @@ function showGameOver() {
                 "click",
                 restartGame
             );
+
     }
 
 
@@ -959,13 +1248,22 @@ function showGameOver() {
     overlay.querySelector(
         ".final-score"
     ).innerHTML =
-        `Score: <strong>${score}</strong>`;
+        `Score:
+        <strong>
+            ${score}
+        </strong>`;
 
 
-    overlay.querySelectorAll(
-        ".final-score"
-    )[1].innerHTML =
-        `Lines: <strong>${lines}</strong>`;
+    overlay
+        .querySelectorAll(
+            ".final-score"
+        )[1]
+        .innerHTML =
+        `Lines:
+        <strong>
+            ${lines}
+        </strong>`;
+
 }
 
 
@@ -981,7 +1279,9 @@ function hideGameOver() {
 
         overlay.style.display =
             "none";
+
     }
+
 }
 
 
@@ -993,8 +1293,13 @@ document.addEventListener(
     "keydown",
     event => {
 
-        if (!gameRunning) {
+        if (
+            !gameRunning ||
+            gamePaused
+        ) {
+
             return;
+
         }
 
 
@@ -1006,6 +1311,7 @@ document.addEventListener(
             event.preventDefault();
 
             playerMove(-1);
+
         }
 
 
@@ -1017,6 +1323,7 @@ document.addEventListener(
             event.preventDefault();
 
             playerMove(1);
+
         }
 
 
@@ -1028,6 +1335,7 @@ document.addEventListener(
             event.preventDefault();
 
             playerDrop();
+
         }
 
 
@@ -1039,6 +1347,7 @@ document.addEventListener(
             event.preventDefault();
 
             playerRotate();
+
         }
 
 
@@ -1050,6 +1359,7 @@ document.addEventListener(
             event.preventDefault();
 
             hardDrop();
+
         }
 
     }
@@ -1057,29 +1367,777 @@ document.addEventListener(
 
 
 // ============================================
-// BUTTONS
+// GRAPH SETTINGS
+// ============================================
+
+let selectedGraphMetric =
+    "score";
+
+
+const graphMetrics = {
+
+    score: {
+
+        label:
+            "Score",
+
+        color:
+            "#3b82f6",
+
+        getValue:
+            record =>
+                record.score,
+
+        format:
+            value =>
+                Math.round(value)
+
+    },
+
+
+    lines: {
+
+        label:
+            "Lines",
+
+        color:
+            "#22c55e",
+
+        getValue:
+            record =>
+                record.lines,
+
+        format:
+            value =>
+                Math.round(value)
+
+    },
+
+
+    performance: {
+
+        label:
+            "Performance",
+
+        color:
+            "#f59e0b",
+
+        getValue:
+            record =>
+                record.performance,
+
+        format:
+            value =>
+                Math.round(value)
+                + "%"
+
+    },
+
+
+    speed: {
+
+        label:
+            "Fall Speed",
+
+        color:
+            "#a855f7",
+
+        getValue:
+            record =>
+                record.speed,
+
+        format:
+            value =>
+                Number(value)
+                    .toFixed(2)
+                + "x"
+
+    }
+
+};
+
+
+// ============================================
+// GRAPH CANVAS
+// ============================================
+
+const experimentChart =
+    document.getElementById(
+        "experimentChart"
+    );
+
+
+const chartCtx =
+    experimentChart
+        ? experimentChart.getContext("2d")
+        : null;
+
+
+// ============================================
+// DRAW EXPERIMENT GRAPH
+// ============================================
+
+function drawExperimentGraph() {
+
+    if (
+        !experimentChart ||
+        !chartCtx
+    ) {
+
+        return;
+
+    }
+
+
+    const container =
+        experimentChart.parentElement;
+
+
+    const width =
+        Math.max(
+            container.clientWidth - 30,
+            200
+        );
+
+
+    const height =
+        Math.max(
+            container.clientHeight - 45,
+            150
+        );
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    experimentChart.width =
+        width * dpr;
+
+
+    experimentChart.height =
+        height * dpr;
+
+
+    experimentChart.style.width =
+        width + "px";
+
+
+    experimentChart.style.height =
+        height + "px";
+
+
+    chartCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    chartCtx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const records =
+        experimentLogger.records || [];
+
+
+    const metric =
+        graphMetrics[
+            selectedGraphMetric
+        ];
+
+
+    updateGraphTitle(
+        records.length
+    );
+
+
+    if (
+        records.length === 0
+    ) {
+
+        chartCtx.fillStyle =
+            "#9ca3af";
+
+
+        chartCtx.font =
+            "14px Arial";
+
+
+        chartCtx.textAlign =
+            "center";
+
+
+        chartCtx.fillText(
+
+            "Start a game to collect experiment data",
+
+            width / 2,
+
+            height / 2
+
+        );
+
+
+        return;
+
+    }
+
+
+    const values =
+        records.map(
+            record => {
+
+                const value =
+                    metric.getValue(
+                        record
+                    );
+
+                return Number(value) || 0;
+
+            }
+        );
+
+
+    let minValue =
+        Math.min(
+            ...values
+        );
+
+
+    let maxValue =
+        Math.max(
+            ...values
+        );
+
+
+    if (
+        minValue === maxValue
+    ) {
+
+        minValue -= 1;
+
+        maxValue += 1;
+
+    }
+
+
+    const range =
+        maxValue - minValue;
+
+
+    const left =
+        55;
+
+    const right =
+        20;
+
+    const top =
+        20;
+
+    const bottom =
+        35;
+
+
+    const graphWidth =
+        width -
+        left -
+        right;
+
+
+    const graphHeight =
+        height -
+        top -
+        bottom;
+
+
+    // ----------------------------------------
+    // GRID
+    // ----------------------------------------
+
+    chartCtx.strokeStyle =
+        "#374151";
+
+
+    chartCtx.lineWidth =
+        1;
+
+
+    const gridLines =
+        5;
+
+
+    for (
+        let i = 0;
+        i <= gridLines;
+        i++
+    ) {
+
+        const y =
+            top +
+            graphHeight -
+            (
+                i /
+                gridLines
+            ) *
+            graphHeight;
+
+
+        chartCtx.beginPath();
+
+        chartCtx.moveTo(
+            left,
+            y
+        );
+
+        chartCtx.lineTo(
+            width - right,
+            y
+        );
+
+        chartCtx.stroke();
+
+
+        const value =
+            minValue +
+            (
+                i /
+                gridLines
+            ) *
+            range;
+
+
+        chartCtx.fillStyle =
+            "#9ca3af";
+
+
+        chartCtx.font =
+            "11px Arial";
+
+
+        chartCtx.textAlign =
+            "right";
+
+
+        chartCtx.fillText(
+
+            metric.format(
+                value
+            ),
+
+            left - 8,
+
+            y + 4
+
+        );
+
+    }
+
+
+    // ----------------------------------------
+    // X AXIS LABELS
+    // ----------------------------------------
+
+    chartCtx.fillStyle =
+        "#9ca3af";
+
+
+    chartCtx.font =
+        "11px Arial";
+
+
+    chartCtx.textAlign =
+        "center";
+
+
+    const labelCount =
+        Math.min(
+            5,
+            records.length
+        );
+
+
+    for (
+        let i = 0;
+        i < labelCount;
+        i++
+    ) {
+
+        const index =
+            Math.floor(
+
+                (
+                    i /
+                    Math.max(
+                        labelCount - 1,
+                        1
+                    )
+                ) *
+
+                (
+                    records.length - 1
+                )
+
+            );
+
+
+        const x =
+            left +
+
+            (
+                index /
+                Math.max(
+                    records.length - 1,
+                    1
+                )
+            ) *
+
+            graphWidth;
+
+
+        chartCtx.fillText(
+
+            records[index]
+                .timeSeconds + "s",
+
+            x,
+
+            height - 10
+
+        );
+
+    }
+
+
+    // ----------------------------------------
+    // GRAPH LINE
+    // ----------------------------------------
+
+    chartCtx.strokeStyle =
+        metric.color;
+
+
+    chartCtx.lineWidth =
+        3;
+
+
+    chartCtx.lineJoin =
+        "round";
+
+
+    chartCtx.lineCap =
+        "round";
+
+
+    chartCtx.beginPath();
+
+
+    values.forEach(
+        (
+            value,
+            index
+        ) => {
+
+            const x =
+                left +
+
+                (
+                    index /
+                    Math.max(
+                        values.length - 1,
+                        1
+                    )
+                ) *
+
+                graphWidth;
+
+
+            const y =
+                top +
+
+                graphHeight -
+
+                (
+                    (
+                        value -
+                        minValue
+                    ) /
+                    range
+                ) *
+
+                graphHeight;
+
+
+            if (
+                index === 0
+            ) {
+
+                chartCtx.moveTo(
+                    x,
+                    y
+                );
+
+            }
+
+            else {
+
+                chartCtx.lineTo(
+                    x,
+                    y
+                );
+
+            }
+
+        }
+    );
+
+
+    chartCtx.stroke();
+
+
+    // ----------------------------------------
+    // DATA POINTS
+    // ----------------------------------------
+
+    chartCtx.fillStyle =
+        metric.color;
+
+
+    values.forEach(
+        (
+            value,
+            index
+        ) => {
+
+            const x =
+                left +
+
+                (
+                    index /
+                    Math.max(
+                        values.length - 1,
+                        1
+                    )
+                ) *
+
+                graphWidth;
+
+
+            const y =
+                top +
+
+                graphHeight -
+
+                (
+                    (
+                        value -
+                        minValue
+                    ) /
+                    range
+                ) *
+
+                graphHeight;
+
+
+            chartCtx.beginPath();
+
+
+            chartCtx.arc(
+
+                x,
+                y,
+                4,
+                0,
+                Math.PI * 2
+
+            );
+
+
+            chartCtx.fill();
+
+        }
+    );
+
+}
+
+
+// ============================================
+// UPDATE GRAPH TITLE
+// ============================================
+
+function updateGraphTitle(
+    count
+) {
+
+    const title =
+        document.getElementById(
+            "graphTitle"
+        );
+
+
+    const recordCount =
+        document.getElementById(
+            "recordCount"
+        );
+
+
+    if (title) {
+
+        title.textContent =
+            graphMetrics[
+                selectedGraphMetric
+            ].label +
+            " over Time";
+
+    }
+
+
+    if (recordCount) {
+
+        recordCount.textContent =
+            "Data Points: " +
+            count;
+
+    }
+
+}
+
+
+// ============================================
+// GRAPH TYPE BUTTONS
+// ============================================
+
+document
+    .querySelectorAll(
+        ".graph-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectedGraphMetric =
+                        button.dataset.metric;
+
+
+                    document
+                        .querySelectorAll(
+                            ".graph-button"
+                        )
+                        .forEach(
+                            otherButton => {
+
+                                otherButton
+                                    .classList
+                                    .remove(
+                                        "active"
+                                    );
+
+                            }
+                        );
+
+
+                    button
+                        .classList
+                        .add(
+                            "active"
+                        );
+
+
+                    drawExperimentGraph();
+
+                }
+            );
+
+        }
+    );
+
+
+// ============================================
+// DOWNLOAD GRAPH
 // ============================================
 
 document
     .getElementById(
-        "startButton"
+        "downloadGraphButton"
     )
     .addEventListener(
         "click",
-        startGame
+        () => {
+
+            if (
+                !experimentLogger.records ||
+                experimentLogger.records.length === 0
+            ) {
+
+                alert(
+                    "No graph data available. Start a game first."
+                );
+
+                return;
+
+            }
+
+
+            drawExperimentGraph();
+
+
+            const image =
+                experimentChart.toDataURL(
+                    "image/png"
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                image;
+
+
+            link.download =
+                "dda-experiment-graph-" +
+                selectedGraphMetric +
+                ".png";
+
+
+            document.body.appendChild(
+                link
+            );
+
+
+            link.click();
+
+
+            document.body.removeChild(
+                link
+            );
+
+        }
     );
 
+
+// ============================================
+// EXPORT CSV
+// ============================================
 
 document
     .getElementById(
-        "restartButton"
+        "exportButton"
     )
-    .addEventListener(
-        "click",
-        restartGame
-    );
-document
-    .getElementById("exportButton")
     .addEventListener(
         "click",
         () => {
@@ -1089,8 +2147,75 @@ document
         }
     );
 
+
+// ============================================
+// RESIZE GRAPH
+// ============================================
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        drawExperimentGraph();
+
+    }
+);
+
+
+// ============================================
+// INITIAL GRAPH
+// ============================================
+
+drawExperimentGraph();
+
+
 // ============================================
 // START RENDERING
 // ============================================
 
 update();
+
+// ============================================
+// START / RESTART BUTTONS
+// ============================================
+
+document
+    .getElementById("startButton")
+    .addEventListener("click", () => {
+
+        if (!gameRunning) {
+
+            startGame();
+
+        } else {
+
+            endCurrentGame();
+
+        }
+
+    });
+
+
+document
+    .getElementById("restartButton")
+    .addEventListener("click", () => {
+
+        restartGame();
+
+    });
+
+// ============================================
+// PAUSE BUTTON
+// ============================================
+
+document
+.getElementById("pauseButton")
+.addEventListener(
+    "click",
+    () => {
+
+        togglePause();
+
+    }
+);
+
