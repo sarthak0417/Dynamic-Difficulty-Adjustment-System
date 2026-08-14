@@ -1,98 +1,223 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Dynamic Difficulty Tetris</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
     <main class="app">
 
         <header class="header">
-            <h1>Dynamic Difficulty Tetris</h1>
-            <p>Real-Time Adaptive Game Difficulty</p>
+
+            <h1>
+                Dynamic Difficulty Tetris
+            </h1>
+
+            <p>
+                Real-Time Adaptive Game Difficulty
+            </p>
+
         </header>
+
+
+        <!-- ========================================
+             GAME + INFORMATION
+        ========================================= -->
 
         <section class="game-layout">
 
-            <!-- Tetris Board -->
+
+            <!-- TETRIS BOARD -->
+
             <div class="game-container">
-                <canvas id="gameCanvas" width="300" height="600"></canvas>
+
+                <canvas
+                    id="gameCanvas"
+                    width="300"
+                    height="600"
+                ></canvas>
+
             </div>
 
-            <!-- Information Panel -->
+
+            <!-- INFORMATION PANEL -->
+
             <aside class="panel">
 
-                <div class="stat">
-                    <span>Score</span>
-                    <strong id="score">0</strong>
-                </div>
 
                 <div class="stat">
-                    <span>Lines</span>
-                    <strong id="lines">0</strong>
+
+                    <span>
+                        Score
+                    </span>
+
+                    <strong id="score">
+                        0
+                    </strong>
+
                 </div>
 
-                <div class="stat">
-                    <span>Level</span>
-                    <strong id="level">1</strong>
-                </div>
 
                 <div class="stat">
-                    <span>Difficulty</span>
-                    <strong id="difficulty">Normal</strong>
+
+                    <span>
+                        Lines
+                    </span>
+
+                    <strong id="lines">
+                        0
+                    </strong>
+
                 </div>
 
+
                 <div class="stat">
-                    <span>Fall Speed</span>
-                    <strong id="speed">1.00x</strong>
+
+                    <span>
+                        Level
+                    </span>
+
+                    <strong id="level">
+                        1
+                    </strong>
+
                 </div>
+
+
+                <div class="stat">
+
+                    <span>
+                        Difficulty
+                    </span>
+
+                    <strong id="difficulty">
+                        Normal
+                    </strong>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <span>
+                        Fall Speed
+                    </span>
+
+                    <strong id="speed">
+                        1.00x
+                    </strong>
+
+                </div>
+
+
+                <!-- DDA MONITOR -->
 
                 <div class="dda-panel">
 
-                    <h2>DDA Monitor</h2>
+                    <h2>
+                        DDA Monitor
+                    </h2>
+
 
                     <div class="metric">
-                        <span>Performance</span>
-                        <strong id="performance">50%</strong>
+
+                        <span>
+                            Performance
+                        </span>
+
+                        <strong id="performance">
+                            50%
+                        </strong>
+
                     </div>
+
 
                     <div class="progress">
-                        <div id="performanceBar"></div>
+
+                        <div
+                            id="performanceBar"
+                        ></div>
+
                     </div>
+
 
                     <div class="metric">
-                        <span>DDA Status</span>
-                        <strong id="ddaStatus">Waiting</strong>
+
+                        <span>
+                            DDA Status
+                        </span>
+
+                        <strong id="ddaStatus">
+                            Waiting
+                        </strong>
+
                     </div>
 
                 </div>
 
+
+                <!-- CONTROLS -->
+
                 <div class="controls">
-                    <button id="startButton">Start Game</button>
-                    <button id="restartButton">Restart</button>
+
+                    <button id="startButton">
+                        Start Game
+                    </button>
+
+                    <button id="pauseButton">
+                        Pause
+                    </button>
+
+                    <button id="restartButton">
+                        Restart
+                    </button>
+
                 </div>
+
+
+                <!-- INSTRUCTIONS -->
 
                 <div class="instructions">
-                    <p><strong>Controls</strong></p>
-                    <p>← → Move</p>
-                    <p>↑ Rotate</p>
-                    <p>↓ Soft Drop</p>
-                    <p>Space Hard Drop</p>
-                </div>
 
-                <div class="experiment-section">
+                    <p>
+                        <strong>
+                            Controls
+                        </strong>
+                    </p>
 
-                    <p><strong>Experiment</strong></p>
+                    <p>
+                        ← → Move
+                    </p>
 
-                    <button id="exportButton">
-                        Export Data
-                    </button>
+                    <p>
+                        ↑ Rotate
+                    </p>
+
+                    <p>
+                        ↓ Soft Drop
+                    </p>
+
+                    <p>
+                        Space Hard Drop
+                    </p>
 
                 </div>
 
@@ -100,11 +225,127 @@
 
         </section>
 
+
+        <!-- ========================================
+             EXPERIMENT / EXPORT SECTION
+        ========================================= -->
+
+        <section class="experiment-section">
+
+
+            <div class="experiment-header">
+
+                <div>
+
+                    <h2>
+                        Experiment Data
+                    </h2>
+
+                    <p>
+                        Visualise player performance
+                        and DDA behaviour.
+                    </p>
+
+                </div>
+
+
+                <div class="experiment-actions">
+
+                    <button
+                        id="exportButton"
+                        class="experiment-button"
+                    >
+                        Export CSV
+                    </button>
+
+
+                    <button
+                        id="downloadGraphButton"
+                        class="experiment-button secondary"
+                    >
+                        Download Graph
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRAPH TYPE BUTTONS -->
+
+            <div class="graph-controls">
+
+                <button
+                    class="graph-button active"
+                    data-metric="score"
+                >
+                    Score
+                </button>
+
+
+                <button
+                    class="graph-button"
+                    data-metric="lines"
+                >
+                    Lines
+                </button>
+
+
+                <button
+                    class="graph-button"
+                    data-metric="performance"
+                >
+                    Performance
+                </button>
+
+
+                <button
+                    class="graph-button"
+                    data-metric="speed"
+                >
+                    Fall Speed
+                </button>
+
+            </div>
+
+
+            <!-- GRAPH -->
+
+            <div class="graph-container">
+
+                <div class="graph-title-row">
+
+                    <h3 id="graphTitle">
+                        Score over Time
+                    </h3>
+
+                    <span id="recordCount">
+                        Data Points: 0
+                    </span>
+
+                </div>
+
+
+                <canvas
+                    id="experimentChart"
+                ></canvas>
+
+            </div>
+
+        </section>
+
     </main>
 
+
+    <!-- GAME SCRIPTS -->
+
     <script src="dda.js"></script>
+
     <script src="logger.js"></script>
+
     <script src="game.js"></script>
 
 </body>
+
 </html>
+
