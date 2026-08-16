@@ -67,7 +67,6 @@ Dynamic-Difficulty-Tetris/
 ├── README.md
 ├── experiment-data.csv
 ├── Project-Report.pdf
-└── IBM-Internship-Presentation.pptx
 ```
 
 ### `index.html`
